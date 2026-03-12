@@ -97,7 +97,7 @@ export default function InquiriesPage() {
                         <span className={cn('badge text-xs shrink-0', statusColors[inquiry.status])}>{inquiry.status}</span>
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{inquiry.car_title}</p>
-                      <p className="text-xs text-slate-400 mt-1">{new Date(inquiry.created).toLocaleDateString()}</p>
+                      <p className="text-xs text-slate-400 mt-1">{new Date(inquiry.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
                 </button>
@@ -112,7 +112,7 @@ export default function InquiriesPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <h2 className="font-semibold text-slate-900 dark:text-white">{selected.name}</h2>
-                  <p className="text-xs text-slate-500 mt-0.5">{new Date(selected.created).toLocaleString()}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{new Date(selected.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => markAs(selected.id, 'replied')} className="p-2 rounded-lg text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-500 transition-colors"><Check className="w-4 h-4" /></button>

@@ -128,7 +128,7 @@ export async function getFeaturedCars(max = 6): Promise<Car[]> {
   return snap.docs.map(d => docToRecord<Car>(d))
 }
 
-export async function createCar(data: Omit<Car, 'id' | 'created' | 'updated'>): Promise<Car> {
+export async function createCar(data: Omit<Car, 'id' | 'createdAt' | 'updatedAt'>): Promise<Car> {
   const ref = await addDoc(collection(db, 'cars'), {
     ...data,
     createdAt: serverTimestamp(),
@@ -182,7 +182,7 @@ export async function getAllCarsAdmin(searchTerm?: string, pageSize = 15, lastDo
 
 // ─── Inquiries ───────────────────────────────────────────────────────────────
 
-export async function createInquiry(data: Omit<Inquiry, 'id' | 'created' | 'updated' | 'status'>): Promise<Inquiry> {
+export async function createInquiry(data: Omit<Inquiry, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<Inquiry> {
   const ref = await addDoc(collection(db, 'inquiries'), {
     ...data,
     status: 'new',
