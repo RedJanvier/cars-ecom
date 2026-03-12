@@ -1,9 +1,7 @@
 export type Car = {
   id: string
-  collectionId: string
-  collectionName: string
-  created: string
-  updated: string
+  createdAt: string
+  updatedAt: string
   title: string
   slug: string
   brand: string
@@ -30,10 +28,8 @@ export type Car = {
 
 export type Inquiry = {
   id: string
-  collectionId: string
-  collectionName: string
-  created: string
-  updated: string
+  createdAt: string
+  updatedAt: string
   car: string
   car_title: string
   name: string
@@ -41,13 +37,12 @@ export type Inquiry = {
   phone: string
   message: string
   status: 'new' | 'read' | 'replied'
-  expand?: {
-    car?: Car
-  }
 }
 
 export type Settings = {
   id: string
+  createdAt: string
+  updatedAt: string
   admin_email: string
   admin_phone: string
   admin_whatsapp: string

@@ -27,18 +27,6 @@ export function getCarDescription(car: Car, locale: 'en' | 'fr'): string {
   return locale === 'fr' && car.description_fr ? car.description_fr : car.description_en
 }
 
-export function getImageUrl(
-  record: { collectionId: string; id: string },
-  filename: string,
-  thumb?: string
-): string {
-  const base = process.env.NEXT_PUBLIC_PB_URL || 'http://127.0.0.1:8090'
-  if (thumb) {
-    return `${base}/api/files/${record.collectionId}/${record.id}/${filename}?thumb=${thumb}`
-  }
-  return `${base}/api/files/${record.collectionId}/${record.id}/${filename}`
-}
-
 export function slugify(text: string): string {
   return text
     .toLowerCase()

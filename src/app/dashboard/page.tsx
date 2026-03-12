@@ -97,7 +97,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-right shrink-0">
                   <span className={`badge text-xs ${inquiry.status === 'new' ? 'badge-blue' : 'badge-gray'}`}>{inquiry.status}</span>
-                  <p className="text-xs text-slate-400 mt-1">{new Date(inquiry.created).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-400 mt-1">{new Date(inquiry.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
             ))
