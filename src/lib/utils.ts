@@ -35,12 +35,40 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-export const CAR_BRANDS = [
-  'Abarth', 'Alfa Romeo', 'Audi', 'BMW', 'Chevrolet', 'Citroën', 'Dacia',
-  'Ferrari', 'Fiat', 'Ford', 'Honda', 'Hyundai', 'Jaguar', 'Jeep', 'Kia',
-  'Lamborghini', 'Land Rover', 'Lexus', 'Maserati', 'Mazda', 'Mercedes-Benz',
-  'Mini', 'Mitsubishi', 'Nissan', 'Opel', 'Peugeot', 'Porsche', 'Renault',
-  'Seat', 'Skoda', 'Subaru', 'Suzuki', 'Tesla', 'Toyota', 'Volkswagen', 'Volvo',
+export const CAR_MODELS: Record<string, string[]> = {
+  'BYD': ['Yuan Up', 'Yuan Plus', 'Song Plus', 'Leopard Titanium 3', 'Seal', 'Destroyer', 'Tang DM-I', 'Seagull', 'Tang L', 'Dolphin'],
+  'AION': ['V', 'V Plus', 'LX', 'LX Plus'],
+  'Radar': ['RD6'],
+  'Toyota': ['BZ3X', 'BZ4X', 'CHR'],
+  'Volkswagen': ['ID4'],
+  'Dongfeng': ['Aeolus'],
+  'iCAR': ['03'],
+  'Jetour': ['Traveler'],
+  'Changan': [],
+  'Hycan': [],
+  'WM Motor': ['EX5-Z'],
+  'Nezha': ['X', 'V'],
+  'Neta': ['U', 'U Pro'],
+  'Weimar': ['EX5', 'W6'],
+  'Geome': [],
+  'Venucia': [],
+  'Nissan': [],
+  'Trumpchi': [],
+}
+
+export const CAR_BRANDS = Object.keys(CAR_MODELS)
+
+export const CAR_FEATURES = [
+  'Air Conditioning', 'Heated Seats', 'Ventilated Seats', 'Leather Seats',
+  'Sunroof / Panoramic Roof', 'Navigation / GPS', 'Bluetooth', 'Apple CarPlay',
+  'Android Auto', 'Backup Camera', '360° Camera', 'Parking Sensors',
+  'Cruise Control', 'Adaptive Cruise Control', 'Lane Assist', 'Blind Spot Monitor',
+  'Keyless Entry', 'Push Button Start', 'Remote Start', 'Power Tailgate',
+  'LED Headlights', 'Fog Lights', 'Alloy Wheels', 'Roof Rails',
+  'Wireless Charging', 'USB-C Ports', 'Premium Sound System', 'Heads-Up Display',
+  'Regenerative Braking', 'Fast Charging', 'V2L (Vehicle-to-Load)', 'Heat Pump',
+  'OTA Updates', 'Auto Pilot / ADAS', 'Electric Folding Mirrors', 'Rain Sensing Wipers',
+  'Tire Pressure Monitoring', 'ABS', 'ESP', 'Airbags (6+)',
 ]
 
 export const BODY_TYPES = ['sedan', 'suv', 'hatchback', 'coupe', 'convertible', 'wagon', 'pickup', 'van']
