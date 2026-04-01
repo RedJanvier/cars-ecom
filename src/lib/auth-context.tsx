@@ -1,13 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import {
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  User,
-} from 'firebase/auth'
-import { auth } from './firebase'
+import { supabase } from './supabase'
 
 type AuthUser = {
   id: string
@@ -29,11 +23,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (firebaseUser: User | null) => {
-      if (firebaseUser) {
+    // Check current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
         setUser({
-          id: firebaseUser.uid,
-          email: firebaseUser.email ?? '',
+          id: session.user.id,
+          email: session.user.email ?? '',
+          isAdmin: true,
+        })
+      }
+      setLoading(false)
+    })
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email ?? '',
           isAdmin: true,
         })
       } else {
@@ -41,15 +48,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setLoading(false)
     })
-    return unsub
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const login = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
   }
 
   const logout = async () => {
-    await signOut(auth)
+    await supabase.auth.signOut()
   }
 
   return (
