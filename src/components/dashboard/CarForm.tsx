@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import toast from 'react-hot-toast'
 import { createCar, updateCar, uploadCarImage, deleteCarImage } from '@/lib/db'
-import { CAR_BRANDS, CAR_MODELS, BODY_TYPES, FUEL_TYPES, slugify, cn } from '@/lib/utils'
+import { CAR_BRANDS, CAR_MODELS, CAR_FEATURES, BODY_TYPES, FUEL_TYPES, slugify, cn } from '@/lib/utils'
 import { Car } from '@/types'
 
 const schema = z.object({
@@ -32,7 +32,7 @@ const schema = z.object({
   description_fr: z.string().optional(),
   status: z.enum(['available', 'sold', 'reserved']),
   featured: z.boolean().optional(),
-  features: z.string().optional(),
+  features: z.array(z.string()).optional(),
 })
 
 type FormData = z.infer<typeof schema>
@@ -56,7 +56,7 @@ export default function CarForm({ car }: CarFormProps) {
       seats: car.seats, power_hp: car.power_hp, engine_cc: car.engine_cc,
       description_en: car.description_en, description_fr: car.description_fr,
       status: car.status, featured: car.featured,
-      features: car.features?.join(', '),
+      features: car.features || [],
     } : {
       condition: 'new', fuel_type: 'electric', transmission: 'automatic', body_type: 'sedan',
       status: 'available', doors: 4, seats: 5, year: new Date().getFullYear(), mileage: 0, featured: false,
@@ -74,7 +74,7 @@ export default function CarForm({ car }: CarFormProps) {
   const onSubmit = async (data: FormData) => {
     setSaving(true)
     try {
-      const featuresArr = (data.features || '').split(',').map((s: string) => s.trim()).filter(Boolean)
+      const featuresArr = data.features || []
       const slug = slugify(`${data.year}-${data.brand}-${data.model}`)
 
       if (car) {
@@ -213,7 +213,38 @@ export default function CarForm({ car }: CarFormProps) {
         <div className="space-y-4">
           <Field label="Description (English)"><textarea {...register('description_en')} rows={4} className="input-clean resize-none text-sm" placeholder="Describe the vehicle in English..." /></Field>
           <Field label="Description (French)"><textarea {...register('description_fr')} rows={4} className="input-clean resize-none text-sm" placeholder="Décrivez le véhicule en français..." /></Field>
-          <Field label="Features (comma separated)"><input {...register('features')} className="input-clean text-sm" placeholder="e.g. Sunroof, Heated Seats, Navigation..." /></Field>
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3">Features</label>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              {CAR_FEATURES.map(feature => {
+                const selected = watch('features') || []
+                return (
+                  <label key={feature} className={cn(
+                    'flex items-center gap-2 px-3 py-2 rounded-xl border text-sm cursor-pointer transition-colors',
+                    selected.includes(feature)
+                      ? 'border-sky-400 bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                  )}>
+                    <input
+                      type="checkbox"
+                      value={feature}
+                      checked={selected.includes(feature)}
+                      onChange={e => {
+                        const current = watch('features') || []
+                        if (e.target.checked) {
+                          setValue('features', [...current, feature])
+                        } else {
+                          setValue('features', current.filter((f: string) => f !== feature))
+                        }
+                      }}
+                      className="w-3.5 h-3.5 rounded text-sky-500 border-slate-300 dark:border-slate-600"
+                    />
+                    {feature}
+                  </label>
+                )
+              })}
+            </div>
+          </div>
           <div className="flex items-center gap-3">
             <input type="checkbox" id="featured" {...register('featured')} className="w-4 h-4 rounded text-sky-500 border-slate-300 dark:border-slate-600" />
             <label htmlFor="featured" className="text-sm font-medium text-slate-700 dark:text-slate-300">Feature this car on the homepage</label>

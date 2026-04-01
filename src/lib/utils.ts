@@ -58,6 +58,19 @@ export const CAR_MODELS: Record<string, string[]> = {
 
 export const CAR_BRANDS = Object.keys(CAR_MODELS)
 
+export const CAR_FEATURES = [
+  'Air Conditioning', 'Heated Seats', 'Ventilated Seats', 'Leather Seats',
+  'Sunroof / Panoramic Roof', 'Navigation / GPS', 'Bluetooth', 'Apple CarPlay',
+  'Android Auto', 'Backup Camera', '360° Camera', 'Parking Sensors',
+  'Cruise Control', 'Adaptive Cruise Control', 'Lane Assist', 'Blind Spot Monitor',
+  'Keyless Entry', 'Push Button Start', 'Remote Start', 'Power Tailgate',
+  'LED Headlights', 'Fog Lights', 'Alloy Wheels', 'Roof Rails',
+  'Wireless Charging', 'USB-C Ports', 'Premium Sound System', 'Heads-Up Display',
+  'Regenerative Braking', 'Fast Charging', 'V2L (Vehicle-to-Load)', 'Heat Pump',
+  'OTA Updates', 'Auto Pilot / ADAS', 'Electric Folding Mirrors', 'Rain Sensing Wipers',
+  'Tire Pressure Monitoring', 'ABS', 'ESP', 'Airbags (6+)',
+]
+
 export const BODY_TYPES = ['sedan', 'suv', 'hatchback', 'coupe', 'convertible', 'wagon', 'pickup', 'van']
 
 export const FUEL_TYPES = ['petrol', 'diesel', 'electric', 'hybrid', 'lpg']
