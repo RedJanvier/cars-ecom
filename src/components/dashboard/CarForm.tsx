@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import toast from 'react-hot-toast'
 import { createCar, updateCar, uploadCarImage, deleteCarImage } from '@/lib/db'
-import { CAR_BRANDS, BODY_TYPES, FUEL_TYPES, slugify, cn } from '@/lib/utils'
+import { CAR_BRANDS, CAR_MODELS, BODY_TYPES, FUEL_TYPES, slugify, cn } from '@/lib/utils'
 import { Car } from '@/types'
 
 const schema = z.object({
@@ -58,7 +58,7 @@ export default function CarForm({ car }: CarFormProps) {
       status: car.status, featured: car.featured,
       features: car.features?.join(', '),
     } : {
-      condition: 'used', fuel_type: 'petrol', transmission: 'manual', body_type: 'sedan',
+      condition: 'new', fuel_type: 'electric', transmission: 'automatic', body_type: 'sedan',
       status: 'available', doors: 4, seats: 5, year: new Date().getFullYear(), mileage: 0, featured: false,
     },
   })
@@ -149,7 +149,7 @@ export default function CarForm({ car }: CarFormProps) {
         </div>
         <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden"
           onChange={e => e.target.files && setNewImages(p => [...p, ...Array.from(e.target.files!)])} />
-        <p className="text-xs text-slate-400 mt-2">Images are uploaded to Firebase Storage.</p>
+        <p className="text-xs text-slate-400 mt-2">Images are uploaded to cloud storage.</p>
       </div>
 
       {/* Basic Info */}
@@ -163,7 +163,14 @@ export default function CarForm({ car }: CarFormProps) {
             </select>
           </Field>
           <Field label="Model" error={errors.model?.message}>
-            <input {...register('model')} onBlur={autoTitle} className="input-clean text-sm" placeholder="e.g. Golf, 3 Series..." />
+            {brand && CAR_MODELS[brand]?.length ? (
+              <select {...register('model')} onBlur={autoTitle} className="input-clean text-sm">
+                <option value="">Select model</option>
+                {CAR_MODELS[brand].map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            ) : (
+              <input {...register('model')} onBlur={autoTitle} className="input-clean text-sm" placeholder="Enter model name" />
+            )}
           </Field>
           <Field label="Year" error={errors.year?.message}>
             <input {...register('year')} type="number" onBlur={autoTitle} className="input-clean text-sm" />
