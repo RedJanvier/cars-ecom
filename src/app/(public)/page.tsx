@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, Shield, Award, Clock, ChevronRight, Star, Zap } from 'lucide-react'
+import { ArrowRight, Shield, Award, Clock, ChevronRight, Star, Zap, CheckCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { getFeaturedCars, getDashboardStats } from '@/lib/db'
 import { translations } from '@/lib/i18n'
 import { Car, Locale } from '@/types'
@@ -35,47 +36,199 @@ export default function HomePage() {
 
   return (
     <div className="dark bg-slate-950">
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden hero-grid">
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }} />
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        {/* Full-bleed background image with Ken Burns slow zoom-out */}
+        <motion.div
+          className="absolute inset-0"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 10, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          <img
+            src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1920&q=85&auto=format&fit=crop"
+            alt="Luxury sports car"
+            className="w-full h-full object-cover object-center"
+          />
+        </motion.div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-sm font-medium mb-8 animate-fade-up">
-              <Zap className="w-4 h-4" />
-              {t.hero.badge}
+        {/* Layered gradient overlays for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/88 to-slate-900/45" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/55" />
+
+        {/* Gold left accent line */}
+        <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-transparent via-amber-400/65 to-transparent" />
+
+        {/* Main content grid */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-44 w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+            {/* ── Left column: text ── */}
+            <div className="max-w-xl">
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-400/10 border border-amber-400/25 text-amber-400 text-sm font-medium mb-8"
+              >
+                <Zap className="w-4 h-4" />
+                {t.hero.badge}
+              </motion.div>
+
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.85, delay: 0.25 }}
+                className="font-display text-5xl sm:text-6xl lg:text-7xl text-white mb-6 leading-[1.05]"
+              >
+                Drive Your<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-amber-100">
+                  Dream
+                </span>
+                <br />Vehicle Today
+              </motion.h1>
+
+              {/* Subtitle */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, delay: 0.45 }}
+                className="text-slate-400 text-lg sm:text-xl mb-8 leading-relaxed"
+              >
+                Discover our curated selection of premium new and pre-owned vehicles.
+                Quality guaranteed, prices you&apos;ll love.
+              </motion.p>
+
+              {/* Trust pills */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.55 }}
+                className="flex flex-wrap gap-x-6 gap-y-2 mb-10"
+              >
+                {['Certified Pre-Owned', 'Free Test Drive', 'Best Price Guarantee'].map((item) => (
+                  <div key={item} className="flex items-center gap-1.5 text-sm text-slate-300">
+                    <CheckCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    {item}
+                  </div>
+                ))}
+              </motion.div>
+
+              {/* CTAs */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.65 }}
+                className="flex flex-col sm:flex-row items-start sm:items-center gap-4"
+              >
+                <Link
+                  href="/cars"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-semibold text-base transition-all duration-200 active:scale-95 shadow-lg shadow-amber-400/25"
+                >
+                  {t.hero.cta_browse} <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href="/cars"
+                  className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-medium"
+                >
+                  View all vehicles <ChevronRight className="w-4 h-4" />
+                </Link>
+              </motion.div>
             </div>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl text-white mb-6 leading-tight animate-fade-up animate-delay-100">
-              Drive Your <span className="gradient-text">Dream</span><br />Vehicle Today
-            </h1>
-            <p className="text-slate-400 text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-up animate-delay-200">
-              Discover our curated selection of premium new and pre-owned vehicles. Quality guaranteed, prices you&apos;ll love.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up animate-delay-300">
-              <Link href="/cars" className="btn-primary text-base px-8 py-4 shadow-lg shadow-sky-500/25">
-                {t.hero.cta_browse}<ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="/cars" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-medium">
-                View all vehicles<ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="mt-16 grid grid-cols-3 gap-6 max-w-lg mx-auto animate-fade-up animate-delay-400">
-              {[
-                { value: stats.total || '50+', label: t.hero.stats_cars },
-                { value: stats.brands || '20+', label: t.hero.stats_brands },
-                { value: '200+', label: t.hero.stats_sold },
-              ].map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-xs text-slate-500 font-medium">{stat.label}</div>
+
+            {/* ── Right column: floating vehicle card (desktop only) ── */}
+            <motion.div
+              initial={{ opacity: 0, x: 48 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, delay: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="hidden lg:flex flex-col gap-4 items-end"
+            >
+              {/* Vehicle showcase card */}
+              <div className="w-full max-w-[360px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/60">
+                <div className="relative">
+                  <img
+                    src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=720&q=85&auto=format&fit=crop"
+                    alt="Featured premium vehicle"
+                    className="w-full aspect-[4/3] object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 bg-amber-400 text-slate-950 rounded-lg text-xs font-bold tracking-widest uppercase">
+                      Featured
+                    </span>
+                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="p-4 bg-slate-900/95 backdrop-blur-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-0.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                      ))}
+                    </div>
+                    <span className="text-xs text-emerald-400 font-medium">● Available Now</span>
+                  </div>
+                  <h3 className="text-white font-semibold text-base mb-1">Porsche 911 Carrera</h3>
+                  <div className="flex items-center justify-between">
+                    <p className="text-slate-400 text-sm">2023 · 15,200 mi</p>
+                    <p className="text-amber-400 font-semibold text-sm">Contact for Price</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating warranty badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 1.1 }}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 backdrop-blur-sm shadow-xl"
+              >
+                <div className="w-9 h-9 rounded-lg bg-amber-400/10 border border-amber-400/20 flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 text-amber-400" />
+                </div>
+                <div>
+                  <div className="text-white text-sm font-semibold">Full Warranty</div>
+                  <div className="text-slate-500 text-xs">3-year comprehensive coverage</div>
+                </div>
+              </motion.div>
+            </motion.div>
+
           </div>
         </div>
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-600 animate-bounce">
-          <div className="w-0.5 h-8 bg-gradient-to-b from-transparent to-slate-600 rounded-full" />
+
+        {/* Bottom stats bar with glass effect */}
+        <div className="absolute bottom-0 left-0 right-0 border-t border-white/5 bg-slate-950/75 backdrop-blur-md">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-8 sm:gap-14">
+                {[
+                  { value: stats.total || '50+', label: t.hero.stats_cars },
+                  { value: stats.brands || '20+', label: t.hero.stats_brands },
+                  { value: '200+', label: t.hero.stats_sold },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.85 + i * 0.1 }}
+                  >
+                    <div className="text-2xl sm:text-3xl font-bold text-white leading-none mb-1">{stat.value}</div>
+                    <div className="text-xs text-slate-500 font-medium">{stat.label}</div>
+                  </motion.div>
+                ))}
+              </div>
+              {/* Scroll indicator */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.4 }}
+                className="hidden sm:flex flex-col items-center gap-2"
+              >
+                <div className="text-[10px] tracking-[0.2em] uppercase text-slate-600">Scroll</div>
+                <div className="w-0.5 h-6 bg-gradient-to-b from-transparent to-slate-600 rounded-full animate-bounce" />
+              </motion.div>
+            </div>
+          </div>
         </div>
       </section>
 
