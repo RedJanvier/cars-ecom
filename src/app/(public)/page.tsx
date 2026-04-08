@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Shield, Award, Clock, ChevronRight, Star, Zap, CheckCircle } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { getFeaturedCars, getDashboardStats } from '@/lib/db'
 import { translations } from '@/lib/i18n'
 import { Car, Locale } from '@/types'
@@ -14,6 +14,7 @@ export default function HomePage() {
   const [featuredCars, setFeaturedCars] = useState<Car[]>([])
   const [stats, setStats] = useState({ total: 0, brands: 0, sold: 0 })
   const [loading, setLoading] = useState(true)
+  const [heroSlide, setHeroSlide] = useState(0)
   const t = translations[locale]
 
   useEffect(() => {
@@ -33,6 +34,16 @@ export default function HomePage() {
     }
     fetchData()
   }, [])
+
+  const heroCards = featuredCars.slice(3, 6)
+
+  useEffect(() => {
+    if (heroCards.length < 2) return
+    const timer = setInterval(() => {
+      setHeroSlide(prev => (prev + 1) % heroCards.length)
+    }, 10000)
+    return () => clearInterval(timer)
+  }, [heroCards.length])
 
   return (
     <div className="dark bg-slate-950">
@@ -137,7 +148,7 @@ export default function HomePage() {
               </motion.div>
             </div>
 
-            {/* ── Right column: floating vehicle card (desktop only) ── */}
+            {/* ── Right column: auto-sliding featured cars (desktop only) ── */}
             <motion.div
               initial={{ opacity: 0, x: 48 }}
               animate={{ opacity: 1, x: 0 }}
@@ -145,35 +156,81 @@ export default function HomePage() {
               className="hidden lg:flex flex-col gap-4 items-end"
             >
               {/* Vehicle showcase card */}
-              <div className="w-full max-w-[360px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/60">
-                <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=720&q=85&auto=format&fit=crop"
-                    alt="Featured premium vehicle"
-                    className="w-full aspect-[4/3] object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
-                  <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 bg-amber-400 text-slate-950 rounded-lg text-xs font-bold tracking-widest uppercase">
-                      Featured
-                    </span>
-                  </div>
-                </div>
-                <div className="p-4 bg-slate-900/95 backdrop-blur-sm">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                      ))}
+              <div className="w-full max-w-[360px] rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/60 bg-slate-900/95">
+                {heroCards.length === 0 ? (
+                  /* Loading skeleton */
+                  <>
+                    <div className="aspect-[4/3] bg-slate-800 animate-pulse" />
+                    <div className="p-4 space-y-3">
+                      <div className="flex justify-between">
+                        <div className="h-3 bg-slate-700 rounded w-24 animate-pulse" />
+                        <div className="h-3 bg-slate-700 rounded w-20 animate-pulse" />
+                      </div>
+                      <div className="h-4 bg-slate-700 rounded w-3/4 animate-pulse" />
+                      <div className="h-3 bg-slate-700 rounded w-2/3 animate-pulse" />
                     </div>
-                    <span className="text-xs text-emerald-400 font-medium">● Available Now</span>
-                  </div>
-                  <h3 className="text-white font-semibold text-base mb-1">Porsche 911 Carrera</h3>
-                  <div className="flex items-center justify-between">
-                    <p className="text-slate-400 text-sm">2023 · 15,200 mi</p>
-                    <p className="text-amber-400 font-semibold text-sm">Contact for Price</p>
-                  </div>
-                </div>
+                  </>
+                ) : (
+                  <>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={heroSlide}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.4 }}
+                      >
+                        <div className="relative">
+                          <img
+                            src={heroCards[heroSlide].images?.[0] ?? ''}
+                            alt={heroCards[heroSlide].title}
+                            className="w-full aspect-[4/3] object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+                          <div className="absolute top-3 left-3">
+                            <span className="px-3 py-1 bg-amber-400 text-slate-950 rounded-lg text-xs font-bold tracking-widest uppercase">
+                              Featured
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                              ))}
+                            </div>
+                            <span className="text-xs text-emerald-400 font-medium">● Available Now</span>
+                          </div>
+                          <h3 className="text-white font-semibold text-base mb-1">{heroCards[heroSlide].title}</h3>
+                          <div className="flex items-center justify-between">
+                            <p className="text-slate-400 text-sm">
+                              {heroCards[heroSlide].year} · {heroCards[heroSlide].mileage.toLocaleString()} mi
+                            </p>
+                            <p className="text-amber-400 font-semibold text-sm">Contact for Price</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+
+                    {/* Dot indicators */}
+                    {heroCards.length > 1 && (
+                      <div className="flex items-center justify-center gap-1.5 pb-4">
+                        {heroCards.map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setHeroSlide(i)}
+                            className={`rounded-full transition-all duration-300 ${
+                              i === heroSlide
+                                ? 'w-5 h-1.5 bg-amber-400'
+                                : 'w-1.5 h-1.5 bg-slate-600 hover:bg-slate-500'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
 
               {/* Floating warranty badge */}
