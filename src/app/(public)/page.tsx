@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Shield, Award, Clock, ChevronRight, Star, Zap } from 'lucide-react'
 import { getFeaturedCars, getDashboardStats } from '@/lib/db'
-import { translations, Locale } from '@/lib/i18n'
-import { Car } from '@/types'
+import { translations } from '@/lib/i18n'
+import { Car, Locale } from '@/types'
 import CarCard from '@/components/public/CarCard'
 
 export default function HomePage() {
