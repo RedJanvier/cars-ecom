@@ -38,7 +38,7 @@ export default function Navbar() {
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         scrolled
           ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm'
-          : 'bg-transparent'
+          : 'bg-transparent text-white dark:text-slate-300'
       )}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,7 +48,7 @@ export default function Navbar() {
             <div className="w-9 h-9 rounded-xl bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30 group-hover:scale-105 transition-transform">
               <Car className="w-5 h-5 text-white" />
             </div>
-            <span className="font-display text-xl text-slate-900 dark:text-white">{dealerName}</span>
+          <span className={cn("font-display text-xl", (!scrolled && pathname === '/') ? 'text-white dark:text-slate-300' : 'text-slate-900 dark:text-white')}>{dealerName}</span>
           </Link>
 
           {/* Desktop nav */}

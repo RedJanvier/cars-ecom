@@ -74,7 +74,7 @@ export default function CarsPage() {
                 placeholder="Search by brand, model..."
                 value={filters.search || ''}
                 onChange={e => setFilter('search', e.target.value || undefined)}
-                className="input-clean pl-10"
+                className="input-clean !pl-[40px]"
               />
             </div>
             <div className="flex gap-2">
