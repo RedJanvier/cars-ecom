@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import toast from 'react-hot-toast'
-import { createCar, updateCar, uploadCarImage, deleteCarImage } from '@/lib/db'
+import { createCar, updateCar, uploadCarImage, deleteCarImage, deleteCar } from '@/lib/db'
 import { CAR_BRANDS, CAR_MODELS, CAR_FEATURES, BODY_TYPES, FUEL_TYPES, slugify, cn } from '@/lib/utils'
 import { Car } from '@/types'
 
@@ -23,13 +23,11 @@ const schema = z.object({
   transmission: z.enum(['manual', 'automatic']),
   body_type: z.enum(['sedan', 'suv', 'hatchback', 'coupe', 'convertible', 'wagon', 'pickup', 'van']),
   mileage: z.coerce.number().min(0),
+  battery_range: z.coerce.number().min(0),
   color: z.string().min(1),
   doors: z.coerce.number().min(1).max(10),
   seats: z.coerce.number().min(1).max(20),
-  power_hp: z.coerce.number().min(0),
-  engine_cc: z.coerce.number().min(0),
   description_en: z.string().optional(),
-  description_fr: z.string().optional(),
   status: z.enum(['available', 'sold', 'reserved']),
   featured: z.boolean().optional(),
   features: z.array(z.string()).optional(),
@@ -52,14 +50,15 @@ export default function CarForm({ car }: CarFormProps) {
     defaultValues: car ? {
       title: car.title, brand: car.brand, model: car.model, year: car.year, price: car.price,
       condition: car.condition, fuel_type: car.fuel_type, transmission: car.transmission,
-      body_type: car.body_type, mileage: car.mileage, color: car.color, doors: car.doors,
-      seats: car.seats, power_hp: car.power_hp, engine_cc: car.engine_cc,
-      description_en: car.description_en, description_fr: car.description_fr,
+      body_type: car.body_type, mileage: car.mileage, battery_range: car.battery_range ?? 0,
+      color: car.color, doors: car.doors, seats: car.seats,
+      description_en: car.description_en,
       status: car.status, featured: car.featured,
       features: car.features || [],
     } : {
       condition: 'new', fuel_type: 'electric', transmission: 'automatic', body_type: 'sedan',
-      status: 'available', doors: 4, seats: 5, year: new Date().getFullYear(), mileage: 0, featured: false,
+      status: 'available', doors: 4, seats: 5, year: new Date().getFullYear(), mileage: 0,
+      battery_range: 0, featured: false,
     },
   })
 
@@ -72,33 +71,45 @@ export default function CarForm({ car }: CarFormProps) {
   }
 
   const onSubmit = async (data: FormData) => {
+    // Require at least one image
+    const totalImages = existingImages.length + newImages.length
+    if (totalImages === 0) {
+      toast.error('Please add at least one photo before saving.')
+      return
+    }
+
     setSaving(true)
     try {
       const featuresArr = data.features || []
       const slug = slugify(`${data.year}-${data.brand}-${data.model}`)
 
       if (car) {
-        // Delete removed images from Storage
         await Promise.all(removedImages.map(url => deleteCarImage(url)))
-        // Upload new images
         const newUrls = await Promise.all(newImages.map(f => uploadCarImage(f, car.id)))
         const allImages = [...existingImages, ...newUrls]
         await updateCar(car.id, { ...data, features: featuresArr, images: allImages, slug } as any)
         toast.success('Car updated successfully!')
       } else {
-        // Create car first to get ID, then upload images
+        // Create car first to get the ID, then upload images
         const created = await createCar({ ...data, features: featuresArr, images: [], slug } as any)
-        const imageUrls = await Promise.all(newImages.map(f => uploadCarImage(f, created.id)))
-        if (imageUrls.length > 0) {
-          await updateCar(created.id, { images: imageUrls })
+
+        let imageUrls: string[]
+        try {
+          imageUrls = await Promise.all(newImages.map(f => uploadCarImage(f, created.id)))
+        } catch {
+          // Upload failed — delete the created car to avoid orphan records
+          await deleteCar(created.id).catch(() => {})
+          throw new Error('Image upload failed. The car was not saved. Please try again.')
         }
+
+        await updateCar(created.id, { images: imageUrls })
         toast.success('Car added successfully!')
       }
 
       router.push('/dashboard/cars')
     } catch (err) {
       console.error(err)
-      toast.error('Failed to save car. Please try again.')
+      toast.error(err instanceof Error ? err.message : 'Failed to save car. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -118,11 +129,18 @@ export default function CarForm({ car }: CarFormProps) {
     </select>
   )
 
+  const totalImages = existingImages.length + newImages.length
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Images */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-        <h2 className="font-semibold text-slate-900 dark:text-white mb-4">Photos</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-semibold text-slate-900 dark:text-white">Photos</h2>
+          {totalImages === 0 && (
+            <span className="text-xs text-red-500 font-medium">At least one photo is required</span>
+          )}
+        </div>
         <div className="flex flex-wrap gap-3">
           {existingImages.map(url => (
             <div key={url} className="relative w-28 h-20 rounded-xl overflow-hidden group">
@@ -177,11 +195,11 @@ export default function CarForm({ car }: CarFormProps) {
           </Field>
           <Field label="Title / Listing Name" error={errors.title?.message}>
             <div className="flex gap-2">
-              <input {...register('title')} className="input-clean text-sm flex-1" placeholder="e.g. 2021 BMW 3 Series Sport" />
+              <input {...register('title')} className="input-clean text-sm flex-1" placeholder="e.g. 2024 BYD Seal Premium" />
               <button type="button" onClick={autoTitle} className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 text-xs font-medium transition-colors">Auto</button>
             </div>
           </Field>
-          <Field label="Price (€)" error={errors.price?.message}>
+          <Field label="Price (RWF)" error={errors.price?.message}>
             <input {...register('price')} type="number" className="input-clean text-sm" placeholder="0" />
           </Field>
           <Field label="Status" error={errors.status?.message}>
@@ -199,9 +217,8 @@ export default function CarForm({ car }: CarFormProps) {
           <Field label="Fuel Type"><Select name="fuel_type" options={FUEL_TYPES.map(f => ({ value: f, label: f.charAt(0).toUpperCase() + f.slice(1) }))} /></Field>
           <Field label="Transmission"><Select name="transmission" options={[{ value: 'manual', label: 'Manual' }, { value: 'automatic', label: 'Automatic' }]} /></Field>
           <Field label="Mileage (km)"><input {...register('mileage')} type="number" className="input-clean text-sm" /></Field>
-          <Field label="Power (HP)"><input {...register('power_hp')} type="number" className="input-clean text-sm" /></Field>
-          <Field label="Engine (cc)"><input {...register('engine_cc')} type="number" className="input-clean text-sm" /></Field>
-          <Field label="Color"><input {...register('color')} className="input-clean text-sm" placeholder="e.g. Midnight Black" /></Field>
+          <Field label="Battery Range (km)"><input {...register('battery_range')} type="number" className="input-clean text-sm" placeholder="e.g. 450" /></Field>
+          <Field label="Color"><input {...register('color')} className="input-clean text-sm" placeholder="e.g. Pearl White" /></Field>
           <Field label="Doors"><input {...register('doors')} type="number" className="input-clean text-sm" /></Field>
           <Field label="Seats"><input {...register('seats')} type="number" className="input-clean text-sm" /></Field>
         </div>
@@ -211,8 +228,7 @@ export default function CarForm({ car }: CarFormProps) {
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
         <h2 className="font-semibold text-slate-900 dark:text-white mb-5">Content</h2>
         <div className="space-y-4">
-          <Field label="Description (English)"><textarea {...register('description_en')} rows={4} className="input-clean resize-none text-sm" placeholder="Describe the vehicle in English..." /></Field>
-          <Field label="Description (French)"><textarea {...register('description_fr')} rows={4} className="input-clean resize-none text-sm" placeholder="Décrivez le véhicule en français..." /></Field>
+          <Field label="Description"><textarea {...register('description_en')} rows={4} className="input-clean resize-none text-sm" placeholder="Describe the vehicle..." /></Field>
           <div>
             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3">Features</label>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">

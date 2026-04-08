@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react'
 import { getCars } from '@/lib/db'
-import { translations, Locale } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
 import { CAR_BRANDS, BODY_TYPES, FUEL_TYPES, cn } from '@/lib/utils'
-import { Car, FilterState } from '@/types'
+import { Car, FilterState, Locale } from '@/types'
 import CarCard from '@/components/public/CarCard'
 
 export default function CarsPage() {
@@ -74,7 +74,7 @@ export default function CarsPage() {
                 placeholder="Search by brand, model..."
                 value={filters.search || ''}
                 onChange={e => setFilter('search', e.target.value || undefined)}
-                className="input-clean pl-10"
+                className="input-clean !pl-[40px]"
               />
             </div>
             <div className="flex gap-2">

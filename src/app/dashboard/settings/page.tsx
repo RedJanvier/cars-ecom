@@ -170,11 +170,9 @@ export default function SettingsPage() {
       {activeTab === 'hero' && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-4">
           <h2 className="font-semibold text-slate-900 dark:text-white">Homepage Content</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Hero Headline (English)" name="hero_headline_en" value={settings.hero_headline_en || ''} onChange={(v) => set('hero_headline_en', v)} placeholder="Drive Your Dream Vehicle Today" />
-            <Field label="Hero Headline (French)" name="hero_headline_fr" value={settings.hero_headline_fr || ''} onChange={(v) => set('hero_headline_fr', v)} placeholder="Conduisez le Véhicule de vos Rêves" />
-            <Field label="Hero Subtitle (English)" name="hero_subtitle_en" value={settings.hero_subtitle_en || ''} onChange={(v) => set('hero_subtitle_en', v)} placeholder="Quality new and used cars..." />
-            <Field label="Hero Subtitle (French)" name="hero_subtitle_fr" value={settings.hero_subtitle_fr || ''} onChange={(v) => set('hero_subtitle_fr', v)} placeholder="Voitures neuves et occasion..." />
+          <div className="grid grid-cols-1 gap-4">
+            <Field label="Hero Headline" name="hero_headline_en" value={settings.hero_headline_en || ''} onChange={(v) => set('hero_headline_en', v)} placeholder="Drive Your Dream Vehicle Today" />
+            <Field label="Hero Subtitle" name="hero_subtitle_en" value={settings.hero_subtitle_en || ''} onChange={(v) => set('hero_subtitle_en', v)} placeholder="Quality new and used cars..." />
           </div>
         </div>
       )}

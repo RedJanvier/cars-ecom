@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, Fuel, Gauge, Calendar, Settings2, Zap, Users, Palette, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
+import { ArrowLeft, BatteryCharging, Gauge, Calendar, Settings2, Fuel, Users, Palette, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
 import { getCarBySlug, getCarById, getSettings } from '@/lib/db'
-import { translations, Locale } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
 import { formatPrice, formatMileage, getCarDescription, cn } from '@/lib/utils'
-import { Car, Settings } from '@/types'
+import { Car, Settings, Locale } from '@/types'
 import InquiryForm from '@/components/public/InquiryForm'
 
 export default function CarDetailPage() {
@@ -71,10 +71,10 @@ export default function CarDetailPage() {
   const statusColors = { available: 'badge-green', sold: 'badge-red', reserved: 'badge-yellow' }
   const specs = [
     { icon: Calendar, label: t.car.year, value: car.year },
-    { icon: Fuel, label: t.car.mileage, value: `${formatMileage(car.mileage, locale)} ${t.common.km}` },
-    { icon: Zap, label: t.car.power, value: `${car.power_hp} ${t.common.hp}` },
+    { icon: Gauge, label: t.car.mileage, value: `${formatMileage(car.mileage)} ${t.common.km}` },
+    { icon: BatteryCharging, label: t.car.battery_range, value: car.battery_range ? `${car.battery_range} ${t.common.km}` : '—' },
+    { icon: Fuel, label: 'Fuel Type', value: t.car[`fuel_${car.fuel_type}` as keyof typeof t.car] as string || car.fuel_type },
     { icon: Settings2, label: t.car.transmission, value: car.transmission === 'manual' ? t.car.transmission_manual : t.car.transmission_automatic },
-    { icon: Gauge, label: t.car.engine, value: `${car.engine_cc} ${t.common.cc}` },
     { icon: Users, label: t.car.seats, value: car.seats },
     { icon: Palette, label: t.car.color, value: car.color },
   ]
@@ -128,7 +128,7 @@ export default function CarDetailPage() {
             <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
               <h3 className="font-semibold text-slate-900 dark:text-white mb-3">{t.car.description}</h3>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm">
-                {getCarDescription(car, locale) || 'No description available.'}
+                {getCarDescription(car) || 'No description available.'}
               </p>
             </div>
 
@@ -153,7 +153,7 @@ export default function CarDetailPage() {
               <p className="text-sky-500 text-sm font-semibold uppercase tracking-wider mb-1">{car.brand}</p>
               <h1 className="font-display text-2xl text-slate-900 dark:text-white mb-4">{car.title}</h1>
               <div className="flex items-end gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-3xl font-bold text-slate-900 dark:text-white">{formatPrice(car.price, locale)}</span>
+                <span className="text-3xl font-bold text-slate-900 dark:text-white">{formatPrice(car.price)}</span>
               </div>
             </div>
 

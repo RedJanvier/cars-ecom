@@ -3,28 +3,29 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, Car, Globe } from 'lucide-react'
+import { Menu, X, Car } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { translations, Locale } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
+import { getSettings } from '@/lib/db'
+import { Settings } from '@/types'
 
-const useLocale = () => {
-  const [locale, setLocale] = useState<Locale>('en')
-  const toggle = () => setLocale(l => l === 'en' ? 'fr' : 'en')
-  return { locale, toggle }
-}
+const nav = translations.en.nav
+const hero = translations.en.hero
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [settings, setSettings] = useState<Settings | null>(null)
   const pathname = usePathname()
-  const { locale, toggle } = useLocale()
-  const nav = translations[locale].nav
 
   useEffect(() => {
+    getSettings().then(setSettings)
     const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const dealerName = settings?.dealership_name || 'AutoElite'
 
   const links = [
     { href: '/', label: nav.home },
@@ -37,7 +38,7 @@ export default function Navbar() {
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         scrolled
           ? 'bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm'
-          : 'bg-transparent'
+          : 'bg-transparent text-white dark:text-slate-300'
       )}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,9 +48,7 @@ export default function Navbar() {
             <div className="w-9 h-9 rounded-xl bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/30 group-hover:scale-105 transition-transform">
               <Car className="w-5 h-5 text-white" />
             </div>
-            <span className="font-display text-xl text-slate-900 dark:text-white">
-              Auto<span className="text-sky-500">Elite</span>
-            </span>
+          <span className={cn("font-display text-xl", (!scrolled && pathname === '/') ? 'text-white dark:text-slate-300' : 'text-slate-900 dark:text-white')}>{dealerName}</span>
           </Link>
 
           {/* Desktop nav */}
@@ -72,20 +71,11 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-2">
-            {/* Language toggle */}
-            <button
-              onClick={toggle}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            >
-              <Globe className="w-4 h-4" />
-              <span>{locale === 'en' ? 'FR' : 'EN'}</span>
-            </button>
-
             <Link
               href="/cars"
               className="hidden md:flex btn-primary text-sm py-2 px-5"
             >
-              {translations[locale].hero.cta_browse}
+              {hero.cta_browse}
             </Link>
 
             {/* Mobile menu toggle */}
@@ -122,7 +112,7 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="btn-primary text-sm mt-2"
               >
-                {translations[locale].hero.cta_browse}
+                {hero.cta_browse}
               </Link>
             </div>
           </div>

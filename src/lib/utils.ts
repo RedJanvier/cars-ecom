@@ -6,25 +6,25 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatPrice(price: number, locale: string = 'en'): string {
-  return new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price)
+export function formatPrice(price: number): string {
+  if (price >= 1_000_000) {
+    const m = price / 1_000_000
+    const formatted = m % 1 === 0 ? m.toFixed(0) : m.toFixed(1)
+    return `RWF ${formatted}M`
+  }
+  return `RWF ${new Intl.NumberFormat('en-US').format(price)}`
 }
 
-export function formatMileage(mileage: number, locale: string = 'en'): string {
-  return new Intl.NumberFormat(locale === 'fr' ? 'fr-FR' : 'en-US').format(mileage)
+export function formatMileage(mileage: number): string {
+  return new Intl.NumberFormat('en-US').format(mileage)
 }
 
 export function getCarTitle(car: Car): string {
   return car.title || `${car.year} ${car.brand} ${car.model}`
 }
 
-export function getCarDescription(car: Car, locale: 'en' | 'fr'): string {
-  return locale === 'fr' && car.description_fr ? car.description_fr : car.description_en
+export function getCarDescription(car: Car): string {
+  return car.description_en
 }
 
 export function slugify(text: string): string {

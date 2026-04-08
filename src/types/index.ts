@@ -15,10 +15,8 @@ export type Car = {
   color: string
   doors: number
   seats: number
-  power_hp: number
-  engine_cc: number
+  battery_range: number
   description_en: string
-  description_fr: string
   features: string[]
   images: string[]
   featured: boolean
@@ -60,15 +58,13 @@ export type Settings = {
   twilio_auth_token: string
   twilio_from_number: string
   hero_headline_en: string
-  hero_headline_fr: string
   hero_subtitle_en: string
-  hero_subtitle_fr: string
   social_instagram: string
   social_facebook: string
   logo: string
 }
 
-export type Locale = 'en' | 'fr'
+export type Locale = 'en'
 
 export type FilterState = {
   brand?: string

@@ -2,18 +2,18 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Fuel, Gauge, Calendar, Settings2, ArrowRight } from 'lucide-react'
+import { BatteryCharging, Gauge, Calendar, Settings2, ArrowRight } from 'lucide-react'
 import { Car } from '@/types'
 import { formatPrice, formatMileage, cn } from '@/lib/utils'
-import { translations, Locale } from '@/lib/i18n'
+import { translations } from '@/lib/i18n'
 
 interface CarCardProps {
   car: Car
-  locale?: Locale
+  locale?: 'en'
 }
 
-export default function CarCard({ car, locale = 'en' }: CarCardProps) {
-  const t = translations[locale]
+export default function CarCard({ car }: CarCardProps) {
+  const t = translations.en
   const mainImage = car.images?.[0]
   const imageUrl = mainImage ?? null
 
@@ -24,7 +24,6 @@ export default function CarCard({ car, locale = 'en' }: CarCardProps) {
   }
 
   const conditionLabel = car.condition === 'new' ? t.car.condition_new : t.car.condition_used
-  const fuelLabel = t.car[`fuel_${car.fuel_type}` as keyof typeof t.car] as string || car.fuel_type
   const transmissionLabel = car.transmission === 'manual' ? t.car.transmission_manual : t.car.transmission_automatic
 
   return (
@@ -84,8 +83,8 @@ export default function CarCard({ car, locale = 'en' }: CarCardProps) {
               <span className="text-xs">{car.year}</span>
             </div>
             <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-              <Fuel className="w-3.5 h-3.5 text-slate-400" />
-              <span className="text-xs">{fuelLabel}</span>
+              <BatteryCharging className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-xs">{car.battery_range ? `${car.battery_range} ${t.common.km}` : '—'}</span>
             </div>
             <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
               <Gauge className="w-3.5 h-3.5 text-slate-400" />
@@ -100,8 +99,8 @@ export default function CarCard({ car, locale = 'en' }: CarCardProps) {
           {/* Price + CTA */}
           <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
             <div>
-              <p className="text-xl font-bold text-slate-900 dark:text-white">
-                {formatPrice(car.price, locale)}
+              <p className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                {formatPrice(car.price)}
               </p>
             </div>
             <span className="flex items-center gap-1 text-sky-500 text-sm font-medium group-hover:gap-2 transition-all">
