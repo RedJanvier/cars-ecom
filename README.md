@@ -15,7 +15,7 @@ optionally **Twilio SMS** and **WhatsApp** links.
 
 ### Public storefront — home / hero
 
-![Home hero](docs/screenshots/home-hero.png)
+<img width="1919" height="958" alt="image" src="https://github.com/user-attachments/assets/c1debc04-1c33-4da8-b375-2aa8dfa49032" />
 
 > Save the hero screenshot from the project brief to
 > [`docs/screenshots/home-hero.png`](docs/screenshots/) so it renders here. See
