@@ -101,10 +101,9 @@ export type Locale = 'en'
 
 export function t(locale: Locale, path: string): string {
   const keys = path.split('.')
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let result: any = translations[locale]
+  let result: unknown = translations[locale]
   for (const key of keys) {
-    result = result?.[key]
+    result = (result as Record<string, unknown> | undefined)?.[key]
   }
-  return result ?? path
+  return typeof result === 'string' ? result : path
 }
